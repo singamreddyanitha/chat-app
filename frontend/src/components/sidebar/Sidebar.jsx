@@ -1,5 +1,5 @@
 
-import Conversations from "./Conversations";
+import Conversations from "./Conversations.jsx";
 import LogoutButton from "./LogoutButton";
 import SearchInput from "./SearchInput";
 
