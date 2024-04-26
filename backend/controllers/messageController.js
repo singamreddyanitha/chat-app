@@ -1,5 +1,6 @@
 import Conversation from "../models/conversationModels.js";
 import Message from "../models/messageModel.js";
+import { getReceiverSocketId, io } from "../socket/socket.js";
 
 export const sendeMessage = async (req, res) => {
     // console.log("message sent", req.params.id);
@@ -30,15 +31,22 @@ export const sendeMessage = async (req, res) => {
             conversation.messages.push(newMessage._id);
         }
 
-        // SOCKET TO FUNCTIONALITY WILL GO HERE
-
-        // this will not run parallely means it will wait for the previous one to be completed or executed completely.
+          // this will not run parallely means it will wait for the previous one to be completed or executed completely.
 
         // await conversation.save();
         // await newMessage.save();
         
         // this will run parallel 
         await Promise.all([conversation.save(), newMessage.save()]);
+
+        // SOCKET TO FUNCTIONALITY WILL GO HERE
+        const receiverSocketId = getReceiverSocketId(receiverId); 
+        if(receiverSocketId) {
+            // io.to(<socket_id>).emit() used to send events to specific client 
+            io.to(receiverSocketId).emit("newMessage", newMessage);
+        }
+
+      
         res.status(201).json(newMessage);
         
     } catch (error) {
